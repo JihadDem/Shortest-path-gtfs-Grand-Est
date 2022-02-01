@@ -1,5 +1,6 @@
 -- JE CRÉE DES TABLES POUR STOCKER LES DONNÉES GTFS
 
+DROP TABLE IF EXISTS trips;
 DROP TABLE IF EXISTS stops;
 DROP TABLE IF EXISTS shapes;
 DROP TABLE IF EXISTS routes;
@@ -39,6 +40,22 @@ CREATE TABLE shapes (
 
 \COPY shapes FROM 'gtfs/shapes.txt' DELIMITER ',' CSV HEADER QUOTE '"';
 
+CREATE TABLE trips (
+    route_id VARCHAR(40) REFERENCES routes(route_id),
+    service_id int,
+    trip_id VARCHAR(40) PRIMARY KEY,
+    trip_headsign TEXT,
+    trip_short_name VARCHAR(40),
+    direction_id INT,
+    block_id INT,
+    wheelchair_accessible INT,
+    bikes_allowed INT,
+    trip_desc VARCHAR(10),
+    shape_id INT
+);
+
+\COPY trips FROM 'gtfs/trips.txt' DELIMITER ',' CSV HEADER;
+
 CREATE TABLE stops (
     stop_id VARCHAR(30) PRIMARY KEY,
     stop_name TEXT,
@@ -52,4 +69,4 @@ CREATE TABLE stops (
     wheelchair_boarding BOOLEAN
 );
 
-\COPY stops FROM 'gtfs/stops.txt' DELIMITER ',' CSV HEADER QUOTE '"';  
+\COPY stops FROM 'gtfs/stops.txt' DELIMITER ',' CSV HEADER QUOTE '"';
