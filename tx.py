@@ -305,6 +305,7 @@ def start(folder, treeView, start_at):
         aggregated_output = open('./tmp/14.successors_list.csv', 'w');
         redondant_reader = csv.DictReader(redondant_src_file);
         aggregated_writer = csv.writer(aggregated_output);
+        aggregated_writer.writerow( ('stop_id', 'stop_name', 'successors') );
 
         def getCouple(stoptime):
             return "("+curr_stoptimes['successor_id']+"/"+curr_stoptimes['successor_name']+"/"+curr_stoptimes['duration']+"/"+curr_stoptimes['departure_time']+")";
