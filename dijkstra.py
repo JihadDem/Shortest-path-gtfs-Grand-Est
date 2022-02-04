@@ -30,7 +30,7 @@ def get_stop_names(ids):
             index = names.index(id);
             if stop['stop_id'] == id:
                 names[index] = stop['stop_name'];
-
+    stops_file.close();
     return names;
 
 next_nodes = [ (0, starting_node) ];
