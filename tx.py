@@ -4,6 +4,7 @@ import csv, operator, sys;
 from datetime import datetime;
 import tkMessageBox;
 import time;
+import json;
 
 def distance_to_center(lat, lon):
     R = 6373.0 # approximate radius of earth in km
@@ -301,6 +302,36 @@ def start(folder, treeView, start_at):
     if start_at <= 14:
         setStepStatus(14, '...');
 
+         redondant_src_file = open('./tmp/13.successors_redondant_sorted.csv','r');
+        aggregated_output = open('./tmp/14.successors_list.csv', 'w');
+        redondant_reader = csv.DictReader(redondant_src_file);
+
+        succ = {};
+
+        while True:
+            try:
+                line = redondant_reader.next();
+            except:
+                break;
+            couple = (int(line['duration']), line['successor_id']);
+            cid = line['stop_id']; # + '/' + line['stop_name'];
+            if succ.has_key(cid) and couple not in succ[cid]:
+                succ[cid].append(couple);
+            else:
+                succ[cid] = [couple];
+
+        aggregated_output.write( str(succ) );
+
+        aggregated_output.close();
+        redondant_src_file.close();
+        setStepStatus(14, 'OK');
+    else:
+        setStepStatus(15, 'OK');
+
+    # aggregate csv by stop_id
+    if start_at <= -1:
+        setStepStatus(14, '...');
+
         redondant_src_file = open('./tmp/13.successors_redondant_sorted.csv','r');
         aggregated_output = open('./tmp/14.successors_list.csv', 'w');
         redondant_reader = csv.DictReader(redondant_src_file);
@@ -346,7 +377,7 @@ def start(folder, treeView, start_at):
     
      # Sort stops in time order for each trip
     if start_at <= 15:
-        setStepStatus(15, '...');
+        '''    if start_at <= 15:
 
         stoptimes_file = open('./tmp/11.stoptimes_reduced.csv', 'r');
         stoporder_file = open('./tmp/15.stoporder_bytrip.csv', 'w');
@@ -371,6 +402,6 @@ def start(folder, treeView, start_at):
         setStepStatus(15, 'OK');
     else:
         setStepStatus(15, 'OK');
-
+    '''
     execution_time = time.time() - start_time;
     tkMessageBox.showinfo("Execution finished", "The execution has terminated in "+str(execution_time)+" seconds");

@@ -1,2 +1,4 @@
 (5, ['StopPoint:OIF59421', 'StopPoint:OIF59424', 'StopPoint:OIF59419', 'StopPoint:OIF59426', 'StopPoint:OIF59425', 'StopPoint:OIF59657'])
 garde de strasbourg> Metz > Verdun > Chalon en champagne > Parc naturel de Reim > Reims
+(4, ['StopPoint:OIF59421', 'StopPoint:OIF59428', 'StopPoint:OIF59420', 'StopPoint:OIF59426', 'StopPoint:OIF59657'])
+garde de strasbourg > Nancy > Auxerre > Sarrebourg > Belfort

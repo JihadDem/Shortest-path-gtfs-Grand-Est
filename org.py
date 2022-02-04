@@ -18,13 +18,14 @@ def dijkstra (s, t, voisins):
     d = {s: 0}
     p = {}
     suivants = [(0, s)] #tas de couples (d[x],x)
+    n_step = 0;
 
     while suivants != []:
 
         dx, x = heappop(suivants)
         if x in M:
             continue
-
+        n_step = n_step + 1;
         M.add(x)
 
         for w, y in voisins(x):
@@ -42,6 +43,7 @@ def dijkstra (s, t, voisins):
         x = p[x]
         path.insert(0, x)
 
+    print(n_step);
     return d[t], path
 
 
@@ -61,7 +63,7 @@ graph = {
 starting_node = "StopPoint:OIF59421"; # Gare de strasbourg
 end_node = "StopPoint:OIF59657"; # Cathédrale Reims
 
-graph = eval ( open('./dict.txt', 'r').read() );
+graph = eval ( open('../gui/tmp/14.successors_list.csv', 'r').read() );
 
 def voisins (s):
     try:
