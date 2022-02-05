@@ -4,7 +4,7 @@ import csv, operator, sys;
 from datetime import datetime;
 import tkMessageBox;
 import time;
-import json;
+
 
 def distance_to_center(lat, lon):
     R = 6373.0 # approximate radius of earth in km
@@ -132,7 +132,7 @@ def start(folder, treeView, start_at):
     if start_at <= 6:
         setStepStatus(6, '...');
 
-        modes = ['1', '2', '3'] # TRAM, TRAIN, BUS
+        modes = ['1'];# , '2', '3'] # TRAM, TRAIN, BUS
 
         routes_read_file = open(folder+'/routes.txt', 'r');
         routes_reader = csv.DictReader(routes_read_file);
@@ -302,7 +302,7 @@ def start(folder, treeView, start_at):
     if start_at <= 14:
         setStepStatus(14, '...');
 
-         redondant_src_file = open('./tmp/13.successors_redondant_sorted.csv','r');
+        redondant_src_file = open('./tmp/13.successors_redondant_sorted.csv','r');
         aggregated_output = open('./tmp/14.successors_list.csv', 'w');
         redondant_reader = csv.DictReader(redondant_src_file);
 
@@ -375,6 +375,30 @@ def start(folder, treeView, start_at):
     else:
         setStepStatus(14, 'OK');
     
+     # Add transfers
+    if start_at <= 15:
+        setStepStatus(15, '...');
+
+        # TODO read transfers , read graph add transfers, write dict
+        transfer_file_reader = open(folder + '/transfers.txt', 'r');
+        transfer_csv_reader = csv.DictReader(transfer_file_reader)
+
+        G = eval ( open('../dijkstra/dict.txt', 'r').read() );
+
+        while True:
+            try:
+                curr_tr = transfer_csv_reader.next();
+            except:
+                break;
+            if curr_tr['from_stop_id'] in G:
+                tuple_to_add = ( int(curr_tr['min_transfer_time']) / 60, curr_tr['to_stop_id'] );
+                G[curr_tr['from_stop_id']].append( tuple_to_add );
+
+        transfer_file_reader.close();
+        setStepStatus(15, 'OK');
+    else:
+        setStepStatus(15, 'OK');
+    print(G)
      # Sort stops in time order for each trip
     if start_at <= 15:
         '''    if start_at <= 15:
