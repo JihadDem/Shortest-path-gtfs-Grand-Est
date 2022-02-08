@@ -3,19 +3,23 @@
 #           'stop_id2':[[precessor1, distance1],[precessor2, distance2], ...],
 #           ...
 
-def bellman_ford(graph, source):
+def shortest_path(graph, source, dest):
     # Etape 1: Préparer la distance et le prédécesseur pour chaque nœud
-    distance, predecessor = dict(), dict()
-    for node in graph:
-        distance[node], predecessor[node] = float('inf'), None
+    distance, predecessor = {}, {}
     distance[source] = 0
+
+    def getDistance(node):
+        try:
+            return distance[node];
+        except:
+            return float('inf');
+
 
     # Étape 2 : Détendre les bords
     for _ in range(len(graph) - 1):
         for node in graph:
             for dist, neighbour in graph[node]:
-                if neighbour not in distance:
-                    distance[neighbour] = float('inf');
+                
                 # Si la distance entre le nœud et le voisin est inférieure à la distance actuelle, store-la.
                 if distance[neighbour] > distance[node] + dist:
                     distance[neighbour], predecessor[neighbour] = distance[node] + dist, node
