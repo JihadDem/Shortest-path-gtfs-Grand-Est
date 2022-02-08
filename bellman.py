@@ -14,6 +14,8 @@ def bellman_ford(graph, source):
     for _ in range(len(graph) - 1):
         for node in graph:
             for dist, neighbour in graph[node]:
+                if neighbour not in distance:
+                    distance[neighbour] = float('inf');
                 # Si la distance entre le nœud et le voisin est inférieure à la distance actuelle, store-la.
                 if distance[neighbour] > distance[node] + dist:
                     distance[neighbour], predecessor[neighbour] = distance[node] + dist, node
@@ -26,28 +28,26 @@ def bellman_ford(graph, source):
     return distance,predecessor
 
 # le prédécesseur qui est un dictionnaire sera le résultat trouvé dans bellman_ford
+id2name = eval( open('../data_generation/output/id2name.json', 'r').read() );
 def shortest_way(predecessor, source, origin):
-    way = [origin]
+    way = [id2name[origin][0].replace('\u00e9', 'é')]
     start = origin
-    while predecessor[start] is not source:
+    while True:
+        if predecessor[start] == source:
+            break;
         start = predecessor[start]
-        way.append(start)
-    way.append(source)
-    return way
+        way.append(id2name[start][0].replace('\u00e9', 'é'))
+    way.append(id2name[source][0].replace('\u00e9', 'é'))
+    return way;
 
+graph = eval( open('../data_generation/output/graph_pred.json', 'r').read() );
 
-# teste examples
-graph = {
-    'a':[[1, 'b'], [4, 'c']],
-    'b':[[3, 'c'], [2, 'd'], [2, 'e']],
-    'c':[],
-    'd':[[1, 'b'], [5, 'c']],
-    'e':[[3, 'd']]
-}
-distance, predecessor = bellman_ford(graph, source='a')
-print(distance)
+starting_node = "StopPoint:OIF59587"; # Gare de Strasbourg
+end_node = "StopPoint:OIF59659"; # Reims
+
+distance, predecessor = bellman_ford(graph, starting_node)
 # {'a': 0, 'c': 4, 'b': 1, 'e': 3, 'd': 3}, le plus court chemin vers 'a' depuis chaque noeud
-print("Shortest distance from d to a:", distance['d'])
+print("Shortest distance from d to a:", distance[end_node])
 # la distance la plus courte entre "b" et "a".
-print("Shortest chemin from d to a:", shortest_way(predecessor, 'a', 'd'))
+print("Shortest chemin from d to a:", shortest_way(predecessor, starting_node, end_node))
 # le chemin le plus court de "d" à "a"

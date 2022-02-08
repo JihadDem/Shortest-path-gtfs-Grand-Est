@@ -1,4 +1,7 @@
 from heapq import *
+import os
+
+BASE_PATH = os.path.dirname(os.path.realpath(__file__)) + '/';
 
 def dijkstra (s, t, voisins):
     M = set()
@@ -29,17 +32,21 @@ def dijkstra (s, t, voisins):
 starting_node = "StopPoint:OIF59587"; # Gare stras
 end_node = "StopPoint:OIF59659"; # Reims
 
-starting_node = "PI1";
-end_node = "PI6";
+# starting_node = "PI1";
+# end_node = "PI6";
 
-graph = eval ( open('../data_generation/output/graph_pi.json', 'r').read() );
+graph = eval ( open(BASE_PATH + '../data_generation/output/graph_pi.json', 'r').read() );
 
 def voisins (s):
     return [] if s not in graph else graph[s];
 
 time, stop_ids = dijkstra(starting_node, end_node, voisins);
 del graph;
-id2name = eval ( open('../data_generation/output/id2name_pi.json', 'r').read() );
+id2name = eval ( open(BASE_PATH + '../data_generation/output/id2name_pi.json', 'r').read() );
+
+print('Temps estimé : ', time, ' minutes');
+print('----------------------------')
+
 
 print('Temps estimé : ', time, ' minutes');
 print('----------------------------');
