@@ -18,9 +18,10 @@ class App:
             r = self.model.get_conf('RADIUS')
             self.view.ask_reduce_stops(lat, lon, r)
 
-        default_config = 'stops-tram-train-bus'
-        self.ask_plot_xy(default_config)
-        self.refresh_stops(default_config)
+        else:
+            default_config = 'stops-metro-train-bus'
+            self.ask_plot_xy(default_config)
+            self.refresh_stops(default_config)
 
     def build(self, lat, lon, r):
         if r > 0:
@@ -35,7 +36,7 @@ class App:
         self.model.build_alpha_beta_from_condensed_model()
         self.model.build_cuboid_from_model('time_expanded')
         self.model.build_cuboid_from_model('condensed')
-        # self.model.build_cuboid_from_model('alphabeta')
+        self.model.build_cuboid_from_model('alphabeta')
         self.model.build_stops()
 
     def ask_plot_xy(self, filename):
@@ -50,7 +51,14 @@ class App:
     def bellman(self, mode_prefix, start_node, end_node, start_time='None'):
         self.model.bellman(mode_prefix, start_node, end_node, start_time)
     def show_result(self, results):
-         self.view.show_result(results)
+        try:
+            self.view.show_result(results)
+        except:
+            self.view.show_error(
+                'Graphe non connexe', 'Nous n\'avons pas ete capable de trouver un chemin correspondant...')
+
+    def report_exec(self, key, value):
+        self.view.report_exec(key, value)
 
     def highlight_stops(self, stops):
         x, y = self.model.get_stops_xy(stop_ids=stops)
