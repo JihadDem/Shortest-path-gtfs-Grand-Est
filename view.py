@@ -17,8 +17,7 @@ class View:
         self.controller = controller
         self.app = qApp
         self.main_window = QMainWindow(None)
-        self.main_window.setWindowTitle(
-            "TX : Exploitation de donnees pour algorithmes de graphes multimodaux")
+        self.main_window.setWindowTitle("TX : Exploitation de donnees pour algorithmes de graphes multimodaux")
         self.dijkstra = QPushButton("Algorithme de Dijkstra")
         self.bellman = QPushButton("Algorithme de Bellman")
         self.table = QTableWidget()
@@ -32,6 +31,13 @@ class View:
         self.end = QComboBox()
         self.time = QComboBox()
         self.last_plot = None
+        self.exec_reports = {
+            'n': QLabel(),
+            'm': QLabel(),
+            'max_k': QLabel(),
+            'k': QLabel(),
+            'state': QLabel()
+        }
         t = ['None']
         for i in range(7, 22):
             for j in range(0, 60, 5):
@@ -48,7 +54,6 @@ class View:
         for i in range(len(header)):
             header.setResizeMode(i, QHeaderView.ResizeToContents)
         
-        # add bar : n, m, iteration, worst case iteration, etat (en cours, erreur, aucun)
 
         vertical_frame = QWidget()
         vertical_layout = QVBoxLayout()
@@ -60,6 +65,11 @@ class View:
         route_types_layout = QHBoxLayout()
         stops_select = QWidget()
         stops_layout = QHBoxLayout()
+        meta = QWidget()
+        meta_layout = QHBoxLayout()
+
+        vertical_layout.setContentsMargins(0, 0, 0, 0)
+        meta_layout.setContentsMargins(15, 0, 0, 15)
 
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
@@ -86,8 +96,19 @@ class View:
         menu_layout.addWidget(self.dijkstra)
         menu_layout.addWidget(self.bellman)
         menu_layout.addStretch(100)
+        meta_layout.addWidget(QLabel("n ="), 5)
+        meta_layout.addWidget(self.exec_reports['n'], 5)
+        meta_layout.addWidget(QLabel("m ="), 5)
+        meta_layout.addWidget(self.exec_reports['m'], 5)
+        meta_layout.addWidget(QLabel("k ="), 5)
+        meta_layout.addWidget(self.exec_reports['k'], 5)
+        meta_layout.addWidget(QLabel("max k ="), 5)
+        meta_layout.addWidget(self.exec_reports['max_k'], 5)
+        meta_layout.addWidget(self.exec_reports['state'], 5)
+        vertical_layout.addWidget(meta)
         vertical_layout.addWidget(self.table, 40)
 
+        meta.setLayout(meta_layout)
         route_types_select.setLayout(route_types_layout)
         stops_select.setLayout(stops_layout)
 
@@ -211,22 +232,17 @@ class View:
         self.start.clear()
         self.end.clear()
         for stop in stops:
-            self.start.addItem(stop['name'].decode(
-                'utf-8'), userData=stop['id'])
-            self.end.addItem(stop['name'].decode('utf-8'), userData=stop['id'])
+            self.start.addItem(stop['name'], userData=stop['id'])
+            self.end.addItem(stop['name'], userData=stop['id'])
 
     def on_stop_selected(self):
-        start_id = str(self.start.itemData(
-            self.start.currentIndex()).toString())
-        end_id = str(self.end.itemData(
-            self.end.currentIndex()).toString())
+        start_id = str(self.start.itemData(self.start.currentIndex()))
+        end_id = str(self.end.itemData(self.end.currentIndex()))
         self.controller.highlight_stops([start_id, end_id])
 
     def ask_bellman(self):
-        start_id = str(self.start.itemData(
-            self.start.currentIndex()).toString())
-        end_id = str(self.end.itemData(
-            self.end.currentIndex()).toString())
+        start_id = str(self.start.itemData(self.start.currentIndex()))
+        end_id = str(self.end.itemData(self.end.currentIndex()))
         mode_prefix = self.get_modes_prefix()
         start_time = str(self.time.itemText(self.time.currentIndex()))
         self.controller.bellman(mode_prefix, start_id, end_id, start_time)
@@ -244,13 +260,12 @@ class View:
                 m = time % 60
                 time = bind_zero(h) + ':' + bind_zero(m)
             self.table.setItem(i, 0, QTableWidgetItem(time))
-            self.table.setItem(i, 1, QTableWidgetItem(name.decode('utf-8')))
+            self.table.setItem(i, 1, QTableWidgetItem(name))
             self.table.setItem(i, 2, QTableWidgetItem(route))
-            self.table.setItem(i, 3, QTableWidgetItem(
-                route_type_str(route_type)))
+            self.table.setItem(i, 3, QTableWidgetItem(route_type_str(route_type)))
             x.append(cx)
             y.append(cy)
-        print(x, y)
+        
         self.draw_path(x, y)
 
     def draw_path(self, x, y, dots=False):
@@ -266,3 +281,8 @@ class View:
         self.last_plot = plt.plot(x, y, style, markersize=markersize)
         self.canvas.draw()
         self.canvas.draw_idle()
+    
+    def report_exec(self, key, value):
+        if key == 'state': value = '<b>' + str(value) + '</b>'
+        self.exec_reports[key].setText(str(value))
+        self.app.processEvents()
