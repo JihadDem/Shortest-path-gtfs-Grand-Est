@@ -567,6 +567,29 @@ class Model:
         self.controller.report_exec('state', 'termine')
         self.controller.show_result(path)
 
+def build_successors_list(self):
+        workspace_path = self.get_conf('WORKSPACE') + '/'
+        extension = self.get_conf('EXTENSION')
+        print('Building successors list...')
+        for source in ['time_expanded-tram','time_expanded-train','time_expanded-bus', 'time_expanded-tram-train','time_expanded-tram-bus', 'time_expanded-train-bus','time_expanded-tram-train-bus','condensed-tram','condensed-train','condensed-bus','condensed-tram-train','condensed-tram-bus','condensed-train-bus','condensed-tram-train-bus']:
+            print(workspace_path+source+'.db')
+            csvsort(workspace_path + source + extension,['from', 'departure'], output_filename=workspace_path + source + 'sort' + extension)
+            print(source + 'have sorted')
+            env = lmdb.open(workspace_path + source + '.db', map_size=int(1e13))
+            with env.begin(write=True) as txn:
+                csviterator = self.open_csv(source+'sort')
+                row = csviterator.next()
+                suc = []
+                stop = row['from']
+                for row in csviterator:
+                    if row['from'] == stop:
+                        suc.append((row['travel_time'],row['departure'],row['arrival'],row['to']))
+                    else:
+                        stop = row['from']
+                        txn.put(stop.encode(), str(suc).encode())
+                        suc = [(row['travel_time'],row['departure'],row['arrival'],row['to'])]
+            print('list sucessors of' + source +'have generated')
+
 def dijkstra(self, mode_prefix, start_node, end_node):
     print('Dijkstra')
 
