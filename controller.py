@@ -36,9 +36,9 @@ class App:
         self.model.build_alpha_beta_from_condensed_model()
         self.model.build_cuboid_from_model('time_expanded')
         self.model.build_cuboid_from_model('condensed')
-        self.model.build_cuboid_from_model('alphabeta')
+        #self.model.build_cuboid_from_model('alphabeta')
+        self.model.build_successors_list()
         self.model.build_stops()
-
     def ask_plot_xy(self, filename):
         x, y = self.model.get_stops_xy(filename)
         self.view.plot_xy(x, y)
