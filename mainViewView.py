@@ -5,6 +5,7 @@ from PyQt4.QtGui import QMainWindow, QSplitter, QWidget, \
                         QMessageBox, QFileDialog, QProgressBar, QTableWidgetItem, \
                         QErrorMessage, QColor, QHeaderView, QAction
 from PyQt4.QtCore import Qt, QCoreApplication
+from mpl_toolkits.basemap import Basemap
 
 # MatPlotLib imports
 import matplotlib.pyplot as plt
@@ -228,7 +229,8 @@ class View(QMainWindow):
             # Routes
             self.ui.resultPanel.setItem(0, i, QTableWidgetItem())
             color = route_colors[i]
-            color = '#%s' % color if color[0] != '#' else color
+            try: color = '#%s' % color if color[0] != '#' else color
+            except: color = '#ffffff'
             self.ui.resultPanel.item(0, i).setBackground(QColor(color))
             route = '%s, ligne %s' % ( route_type_str[route_types[i]], route_names[i] )
             self.ui.resultPanel.setItem(1, i, QTableWidgetItem(route))
@@ -241,11 +243,19 @@ class View(QMainWindow):
     # PLOTS AND GRAPHS
 
     def drawStops(self, lat, lon, types):
-        palette = ['#5289c2', '#f99625', '#f52828']
-        colors = [ palette[t % 3] for t in types ]
         plt.clf()
         plt.axis('off')
-        plt.scatter(lat, lon, color=colors, s=2)
+        bot_left_lat = min(lat)
+        bot_left_lon = min(lon)
+        top_right_lat = max(lat)
+        top_right_lon = max(lon)
+        self.map = Basemap(resolution='i', projection='cyl', \
+            llcrnrlon=bot_left_lon, llcrnrlat=bot_left_lat, \
+            urcrnrlon=top_right_lon, urcrnrlat=top_right_lat)
+        self.map.arcgisimage(service='World_Street_Map', xpixels = 1000, ypixels=1000, verbose= False)
+        palette = ['#5289c2', '#f99625', '#f52828']
+        colors = [ palette[t % 3] for t in types ]
+        self.map.scatter(lon, lat, color=colors, s=2)
         self.ui.canvas.draw()
 
     def highlightSlectedStops(self):
@@ -257,5 +267,5 @@ class View(QMainWindow):
     def drawStopPath(self, lats, lons):
         try: self.ui.highlightPlot[0].remove()
         except: pass
-        self.ui.highlightPlot = plt.plot(lats, lons, 'o--', markersize = 4, color="black")
+        self.ui.highlightPlot = self.map.plot(lons, lats, 'o--', markersize = 4, color="black")
         self.ui.canvas.draw()
