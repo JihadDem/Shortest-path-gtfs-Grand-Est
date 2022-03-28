@@ -7,6 +7,7 @@ class App(QApplication):
         QApplication.__init__(self, argv)
         self.view = View(self)
         self.model = Model(self)
+        self.view.disableModes(self.model.workspace.getPossibleModes())
         self.reloadStops()
         self.exec_()
 
